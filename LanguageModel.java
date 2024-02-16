@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -33,19 +36,67 @@ public class LanguageModel {
 
     /** Builds a language model from the text in the given file (the corpus). */
 	public void train(String fileName) {
-		// Your code goes here
-	}
+		   try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            StringBuilder content = new StringBuilder();
+            String line;
+
+            // Read the content of the file
+            while ((line = br.readLine()) != null) {
+                content.append(line);
+            }
+
+            // Create a list to store character data
+            List charDataList = new List();
+
+            // Iterate over the characters in the content
+            for (char chr : content.toString().toCharArray()) {
+                // Update the list with the current character
+                charDataList.update(chr);
+            }
+
+            // Calculate and set the probabilities for each CharData
+            calculateProbabilities(charDataList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
 	public void calculateProbabilities(List probs) {				
-		// Your code goes here
-	}
+        int totalCount = probs.getSize();
+        CharData currentCharData = probs.get(0);  
+    
+        double cumulativeProbability = 0.0;
+    
+        for (int i = 0; i < probs.getSize(); i++) {
+            currentCharData.p = (double) currentCharData.count / totalCount;
+            cumulativeProbability += currentCharData.p;
+            currentCharData.cp = cumulativeProbability;
+    
+            
+            currentCharData = probs.get(i + 1);  
+        }
+    }
 
     // Returns a random character from the given probabilities list.
 	public char getRandomChar(List probs) {
-		// Your code goes here
-	}
+        double randomValue = randomGenerator.nextDouble(); 
+
+        ListIterator iterator = probs.listIterator(0);
+    
+        for (int i = 0; i < probs.getSize(); i++) {
+            CharData currentCharData = probs.get(i);
+            if (randomValue < currentCharData.cp) {
+                return currentCharData.chr;
+            }
+        }
+    
+   
+        return probs.get(probs.getSize() - 1).chr;
+    }
+
 
     /**
 	 * Generates a random text, based on the probabilities that were learned during training. 
@@ -55,8 +106,22 @@ public class LanguageModel {
 	 * @return the generated text
 	 */
 	public String generate(String initialText, int textLength) {
-		// Your code goes here
-	}
+        StringBuilder generatedText = new StringBuilder(initialText);
+
+        String lastSubstring = initialText.substring(initialText.length() - windowLength);
+    
+        while (generatedText.length() < textLength && CharDataMap.containsKey(lastSubstring)) {
+            List probabilities = CharDataMap.get(lastSubstring);
+            char nextChar = getRandomChar(probabilities);
+            generatedText.append(nextChar);
+    
+            // Update lastSubstring for the next iteration
+            lastSubstring = generatedText.substring(generatedText.length() - windowLength);
+        }
+    
+        return generatedText.toString();
+    }
+
 
     /** Returns a string representing the map of this language model. */
 	public String toString() {
