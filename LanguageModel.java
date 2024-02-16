@@ -70,10 +70,16 @@ public class LanguageModel {
 
     for (int i = 0; i < probs.getSize(); i++) {
         CharData currentCharData = probs.get(i);
-        currentCharData.p = (double) currentCharData.count / totalCount;
+        currentCharData.p = (double) currentCharData.count / (double) totalCount;
         cumulativeProbability += currentCharData.p;
         currentCharData.cp = cumulativeProbability;
     }
+    if (cumulativeProbability > 1.0) {
+        for (int i = 0; i < probs.getSize(); i++) {
+          CharData currentCharData = probs.get(i);
+          currentCharData.cp /= cumulativeProbability;
+        }
+      }
 }
 
     // Returns a random character from the given probabilities list.
