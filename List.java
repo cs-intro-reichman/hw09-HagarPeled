@@ -89,14 +89,20 @@ public class List {
     public boolean remove(char chr) {
         Node current = first;
         Node prev = null;
+    
         while (current != null) {
             if (current.cp.chr == chr) {
-                prev = current;
-                current = current.next;
+                if (prev != null) {
+                    prev.next = current.next;
+                } else {
+                    first = current.next;
+                }
                 size--;
                 return true;
+            }
+            prev = current;
+            current = current.next;
         }
-    }
         return false;
     }
 
