@@ -36,24 +36,24 @@ public class LanguageModel {
 
     /** Builds a language model from the text in the given file (the corpus). */
 	public void train(String fileName) {
-		   try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             StringBuilder content = new StringBuilder();
             String line;
-
+    
             // Read the content of the file
             while ((line = br.readLine()) != null) {
                 content.append(line);
             }
-
+    
             // Create a list to store character data
             List charDataList = new List();
-
+    
             // Iterate over the characters in the content
             for (char chr : content.toString().toCharArray()) {
                 // Update the list with the current character
                 charDataList.update(chr);
             }
-
+    
             // Calculate and set the probabilities for each CharData
             calculateProbabilities(charDataList);
         } catch (IOException e) {
@@ -70,7 +70,7 @@ public class LanguageModel {
     
         double cumulativeProbability = 0.0;
     
-        for (int i = 0; i < probs.getSize(); i++) {
+        for (int i = 0; i < probs.getSize() - 1; i++) {
             currentCharData.p = (double) currentCharData.count / totalCount;
             cumulativeProbability += currentCharData.p;
             currentCharData.cp = cumulativeProbability;
@@ -82,21 +82,19 @@ public class LanguageModel {
 
     // Returns a random character from the given probabilities list.
 	public char getRandomChar(List probs) {
-        double randomValue = randomGenerator.nextDouble(); 
+        double randomValue = randomGenerator.nextDouble();
 
-        ListIterator iterator = probs.listIterator(0);
-    
-        for (int i = 0; i < probs.getSize(); i++) {
-            CharData currentCharData = probs.get(i);
-            if (randomValue < currentCharData.cp) {
-                return currentCharData.chr;
-            }
+    ListIterator iterator = probs.listIterator(0);
+
+    while (iterator.hasNext()) {
+        CharData currentCharData = iterator.next();
+        if (randomValue < currentCharData.cp) {
+            return currentCharData.chr;
         }
-    
-   
-        return probs.get(probs.getSize() - 1).chr;
     }
 
+    return probs.get(probs.getSize() - 1).chr;
+}
 
     /**
 	 * Generates a random text, based on the probabilities that were learned during training. 
