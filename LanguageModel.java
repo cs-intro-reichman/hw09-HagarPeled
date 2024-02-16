@@ -154,4 +154,4 @@ public class LanguageModel {
         System.out.println(lm.generate(initialText, generatedTextLength));
     }
     }
-}
+
