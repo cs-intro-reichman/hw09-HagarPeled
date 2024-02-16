@@ -36,7 +36,7 @@ public class LanguageModel {
 
     /** Builds a language model from the text in the given file (the corpus). */
 	public void train(String fileName) {
-		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             StringBuilder content = new StringBuilder();
             String line;
     
@@ -66,35 +66,31 @@ public class LanguageModel {
 	// characters in the given list. */
 	public void calculateProbabilities(List probs) {				
         int totalCount = probs.getSize();
-        CharData currentCharData = probs.get(0);  
-    
-        double cumulativeProbability = 0.0;
-    
-        for (int i = 0; i < probs.getSize() - 1; i++) {
-            currentCharData.p = (double) currentCharData.count / totalCount;
-            cumulativeProbability += currentCharData.p;
-            currentCharData.cp = cumulativeProbability;
-    
-            
-            currentCharData = probs.get(i + 1);  
-        }
+    double cumulativeProbability = 0.0;
+
+    for (int i = 0; i < probs.getSize(); i++) {
+        CharData currentCharData = probs.get(i);
+        currentCharData.p = (double) currentCharData.count / totalCount;
+        cumulativeProbability += currentCharData.p;
+        currentCharData.cp = cumulativeProbability;
     }
+}
 
     // Returns a random character from the given probabilities list.
 	public char getRandomChar(List probs) {
         double randomValue = randomGenerator.nextDouble();
 
-    ListIterator iterator = probs.listIterator(0);
-
-    while (iterator.hasNext()) {
-        CharData currentCharData = iterator.next();
-        if (randomValue < currentCharData.cp) {
-            return currentCharData.chr;
+        ListIterator iterator = probs.listIterator(0);
+    
+        while (iterator.hasNext()) {
+            CharData currentCharData = iterator.next();
+            if (randomValue < currentCharData.cp) {
+                return currentCharData.chr;
+            }
         }
+    
+        return probs.get(probs.getSize() - 1).chr;
     }
-
-    return probs.get(probs.getSize() - 1).chr;
-}
 
     /**
 	 * Generates a random text, based on the probabilities that were learned during training. 
