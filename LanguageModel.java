@@ -70,7 +70,7 @@ public class LanguageModel {
 
     for (int i = 0; i < probs.getSize(); i++) {
         CharData currentCharData = probs.get(i);
-        currentCharData.p = (double) currentCharData.count / (double) totalCount;
+        currentCharData.p = (double) currentCharData.count / totalCount;
         cumulativeProbability += currentCharData.p;
         currentCharData.cp = cumulativeProbability;
     }
