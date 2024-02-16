@@ -74,11 +74,12 @@ public class LanguageModel {
         cumulativeProbability += currentCharData.p;
         currentCharData.cp = cumulativeProbability;
     }
-    if (Math.abs(cumulativeProbability - 1.0) > 1e-6) {
-        for (CharData currentCharData : probs) {
-            currentCharData.cp /= cumulativeProbability;
+    if (cumulativeProbability > 1.0) {
+        for (int i = 0; i < probs.getSize(); i++) {
+          CharData currentCharData = probs.get(i);
+          currentCharData.cp /= cumulativeProbability;
         }
-    }
+      }
 }
 
     // Returns a random character from the given probabilities list.
