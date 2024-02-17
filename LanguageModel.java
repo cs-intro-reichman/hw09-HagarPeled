@@ -39,7 +39,7 @@ public class LanguageModel {
         In in = new In(fileName);
         StringBuilder window = new StringBuilder();
 
-        for (int i= 0; i < window.length() && !in.isEmpty(); i++) {
+        for (int i= 0; i < windowLength && !in.isEmpty(); i++) {
             char c = in.readChar();
             window.append(c);
         }
