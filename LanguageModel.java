@@ -111,30 +111,19 @@ public class LanguageModel {
 	 * @return the generated text
 	 */
 	public String generate(String initialText, int textLength) {
-        StringBuilder generatedText = new StringBuilder(initialText);
-
-        // Ensure initial text and window length are valid
-        if (initialText.length() < windowLength || !CharDataMap.containsKey(initialText.substring(0, windowLength))) {
-            return initialText; // Handle case where initial text is too short or not found
+        int length = initialText.length(), i = 0;
+        if (length < windowLength) return initialText;
+        String generatedText = initialText, window = "";
+        List probs;
+        while (generatedText.length() - length < textLength) {
+            window = generatedText.substring(i, i + windowLength);
+            probs = CharDataMap.get(window);
+            if (probs == null) return generatedText;
+            generatedText += getRandomChar(probs);
+            i++;
         }
     
-        String lastSubstring = initialText.substring(initialText.length() - windowLength);
-    
-        while (generatedText.length() < textLength) {
-            // Check if substring exists in CharDataMap before generating
-            if (!CharDataMap.containsKey(lastSubstring)) {
-                break; // Terminate loop if no matching substring found
-            }
-    
-            List probabilities = CharDataMap.get(lastSubstring);
-            char nextChar = getRandomChar(probabilities);
-            generatedText.append(nextChar);
-    
-            // Update lastSubstring for next iteration
-            lastSubstring = generatedText.substring(generatedText.length() - windowLength);
-        }
-    
-        return generatedText.toString();
+        return generatedText;
     }
 
 
